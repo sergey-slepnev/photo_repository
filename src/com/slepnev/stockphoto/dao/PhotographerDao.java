@@ -4,6 +4,7 @@ import com.slepnev.stockphoto.entity.PhotographerEntity;
 import com.slepnev.stockphoto.exception.DaoException;
 import com.slepnev.stockphoto.util.ConnectionManager;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -15,14 +16,14 @@ public class PhotographerDao implements Dao<Integer, PhotographerEntity> {
 
     private static final PhotographerDao INSTANCE = new PhotographerDao();
     private static final String SAVE_SQL = """
-            INSERT INTO photographer(username, email, name, phone_number, social_network, status)
+            INSERT INTO photographer(username, email, password, phone_number, social_network, status)
             VALUES (?,?,?,?,?,?);
             """;
     public static final String FIND_ALL_SQL = """
             SELECT id,
                 username,
                 email,
-                name,
+                password,
                 phone_number,
                 social_network,
                 status
@@ -35,7 +36,7 @@ public class PhotographerDao implements Dao<Integer, PhotographerEntity> {
             UPDATE photographer
             SET username = ?,
                 email = ?,
-                name = ?,
+                password = ?,
                 phone_number = ?,
                 social_network = ?,
                 status = ?
@@ -84,10 +85,9 @@ public class PhotographerDao implements Dao<Integer, PhotographerEntity> {
         }
     }
 
-    @Override
-    public Optional<PhotographerEntity> findById(Integer id) {
-        try (var connection = ConnectionManager.get();
-             var preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
+
+    public Optional<PhotographerEntity> findById(Integer id, Connection connection) {
+        try (var preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
             preparedStatement.setInt(1, id);
             var resultSet = preparedStatement.executeQuery();
             PhotographerEntity photographer = null;
@@ -95,7 +95,16 @@ public class PhotographerDao implements Dao<Integer, PhotographerEntity> {
                 photographer = PhotographerEntity.build(resultSet);
             }
             return Optional.ofNullable(photographer);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+
+    @Override
+    public Optional<PhotographerEntity> findById(Integer id) {
+        try (var connection = ConnectionManager.get()) {
+            return findById(id, connection);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -127,7 +136,7 @@ public class PhotographerDao implements Dao<Integer, PhotographerEntity> {
     private void setValues(PhotographerEntity photographer, PreparedStatement preparedStatement) throws SQLException {
         preparedStatement.setString(1, photographer.getUsername());
         preparedStatement.setString(2, photographer.getEmail());
-        preparedStatement.setString(3, photographer.getName());
+        preparedStatement.setString(3, photographer.getPassword());
         preparedStatement.setString(4, photographer.getPhoneNumber());
         preparedStatement.setString(5, photographer.getSocialNetwork());
         preparedStatement.setString(6, photographer.getStatus());

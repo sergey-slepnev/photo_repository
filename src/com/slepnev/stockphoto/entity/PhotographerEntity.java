@@ -1,14 +1,23 @@
 package com.slepnev.stockphoto.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PhotographerEntity {
 
     private static final String PHOTOGRAPHER_ID_COLUMN = "id";
     private static final String PHOTOGRAPHER_USERNAME_COLUMN = "username";
     private static final String PHOTOGRAPHER_EMAIL_COLUMN = "email";
-    private static final String PHOTOGRAPHER_NAME_COLUMN = "name";
+    private static final String PHOTOGRAPHER_PASSWORD_COLUMN = "password";
     private static final String PHOTOGRAPHER_PHONE_NUMBER_COLUMN = "phone_number";
     private static final String PHOTOGRAPHER_SOCIAL_NETWORK_COLUMN = "social_network";
     private static final String PHOTOGRAPHER_STATUS_COLUMN = "status";
@@ -16,31 +25,17 @@ public class PhotographerEntity {
     private Integer id;
     private String username;
     private String email;
-    private String name;
+    private String password;
     private String phoneNumber;
     private String socialNetwork;
     private String status;
-
-    public PhotographerEntity() {
-    }
-
-    public PhotographerEntity(Integer id, String username, String email, String name,
-                              String phoneNumber, String socialNetwork, String status) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-        this.socialNetwork = socialNetwork;
-        this.status = status;
-    }
 
     public static PhotographerEntity build(ResultSet resultSet) throws SQLException {
         return new PhotographerEntity(
                 resultSet.getInt(PHOTOGRAPHER_ID_COLUMN),
                 resultSet.getString(PHOTOGRAPHER_USERNAME_COLUMN),
                 resultSet.getString(PHOTOGRAPHER_EMAIL_COLUMN),
-                resultSet.getString(PHOTOGRAPHER_NAME_COLUMN),
+                resultSet.getString(PHOTOGRAPHER_PASSWORD_COLUMN),
                 resultSet.getString(PHOTOGRAPHER_PHONE_NUMBER_COLUMN),
                 resultSet.getString(PHOTOGRAPHER_SOCIAL_NETWORK_COLUMN),
                 resultSet.getString(PHOTOGRAPHER_STATUS_COLUMN)
@@ -75,12 +70,12 @@ public class PhotographerEntity {
         this.email = email;
     }
 
-    public String getName() {
-        return name;
+    public String getPassword() {
+        return password;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
 
@@ -111,13 +106,13 @@ public class PhotographerEntity {
     @Override
     public String toString() {
         return "PhotographerEntity{" +
-                "id=" + id +
-                ", userName='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", name='" + name + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", socialNetwork='" + socialNetwork + '\'' +
-                ", status=" + status +
-                '}';
+               "id=" + id +
+               ", userName='" + username + '\'' +
+               ", email='" + email + '\'' +
+               ", name='" + password + '\'' +
+               ", phoneNumber='" + phoneNumber + '\'' +
+               ", socialNetwork='" + socialNetwork + '\'' +
+               ", status=" + status +
+               '}';
     }
 }

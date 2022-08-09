@@ -6,5 +6,7 @@ public enum PhotoThemeEnum {
     CATS,
     DOGS,
     NATURE,
-    PEOPLE
+    PEOPLE,
+    SKY,
+    FOREST
 }

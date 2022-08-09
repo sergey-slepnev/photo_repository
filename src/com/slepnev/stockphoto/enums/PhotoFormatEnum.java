@@ -4,5 +4,4 @@ public enum PhotoFormatEnum {
 
     JPEG,
     PNG,
-    TIFF
 }

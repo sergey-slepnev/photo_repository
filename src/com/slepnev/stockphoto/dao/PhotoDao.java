@@ -4,10 +4,7 @@ import com.slepnev.stockphoto.entity.PhotoEntity;
 import com.slepnev.stockphoto.exception.DaoException;
 import com.slepnev.stockphoto.util.ConnectionManager;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,8 +13,8 @@ public class PhotoDao implements Dao<Long, PhotoEntity> {
 
     private static final PhotoDao INSTANCE = new PhotoDao();
     private static final String SAVE_SQL = """
-            INSERT INTO photo(photo_theme, photo_format, resolution, photographer_id, size, is_free, cost, created_at)
-            VALUES (?,?,?,?,?,?,?,?)
+            INSERT INTO photo(photo_theme, photo_format, resolution, photographer_id, size, is_free, cost, created_at, link)
+            VALUES (?,?,?,?,?,?,?,?,?)
             """;
     private static final String FIND_ALL_SQL = """
             SELECT photo.id,
@@ -29,18 +26,14 @@ public class PhotoDao implements Dao<Long, PhotoEntity> {
             is_free,
             cost,
             created_at,
-            p.username,
-            p.email,
-            p.name,
-            p.phone_number,
-            p.social_network,
-            p.status                   
+            link
             FROM photo
-            JOIN photographer p ON photo.photographer_id = p.id
+                       
             """;
     private static final String FIND_BY_ID_SQL = FIND_ALL_SQL + """
             WHERE photo.id = ?
             """;
+
     private static final String UPDATE_SQL = """
             UPDATE photo
             SET photo_theme = ?,
@@ -50,12 +43,30 @@ public class PhotoDao implements Dao<Long, PhotoEntity> {
             size = ?,
             is_free = ?,
             cost = ?,
-            created_at = ?
+            created_at = ?,
+            link = ?
             WHERE id = ?
             """;
     private static final String DELETE_SQL = """
             DELETE FROM photo
             WHERE id = ?
+            """;
+    private static final String FIND_ALL_BY_PHOTOGRAPHER_ID_SQL = """
+            SELECT id,
+            photo_theme, 
+            photo_format, 
+            resolution, 
+            photographer_id, 
+            size, is_free, 
+            cost, 
+            created_at,
+            link
+            FROM photo
+            WHERE photographer_id = ?;
+            """;
+
+    private static final String FIND_BY_THEME = FIND_ALL_SQL + """
+            WHERE photo_theme  = ?
             """;
 
     private PhotoDao() {
@@ -88,7 +99,7 @@ public class PhotoDao implements Dao<Long, PhotoEntity> {
             var resultSet = preparedStatement.executeQuery();
             List<PhotoEntity> result = new ArrayList<>();
             while (resultSet.next()) {
-                result.add(PhotoEntity.build(resultSet));
+                result.add(PhotoEntity.buildPhotoEntity(resultSet));
             }
             return result;
         } catch (SQLException e) {
@@ -104,7 +115,7 @@ public class PhotoDao implements Dao<Long, PhotoEntity> {
             var resultSet = preparedStatement.executeQuery();
             PhotoEntity photo = null;
             if (resultSet.next()) {
-                photo = PhotoEntity.build(resultSet);
+                photo = PhotoEntity.buildPhotoEntity(resultSet);
             }
             return Optional.ofNullable(photo);
 
@@ -135,14 +146,45 @@ public class PhotoDao implements Dao<Long, PhotoEntity> {
         }
     }
 
+    public List<PhotoEntity> findAllByPhotographer(Integer photographerId) {
+        try (var connection = ConnectionManager.get();
+             var preparedStatement = connection.prepareStatement(FIND_ALL_BY_PHOTOGRAPHER_ID_SQL)) {
+            preparedStatement.setInt(1, photographerId);
+            var resultSet = preparedStatement.executeQuery();
+            List<PhotoEntity> photos = new ArrayList<>();
+            while (resultSet.next()) {
+                photos.add(PhotoEntity.buildPhotoEntity(resultSet));
+            }
+            return photos;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<PhotoEntity> findByTheme(String theme) {
+        try (Connection connection = ConnectionManager.get();
+             var preparedStatement = connection.prepareStatement(FIND_BY_THEME)) {
+            preparedStatement.setString(1, theme);
+            var resultSet = preparedStatement.executeQuery();
+            List<PhotoEntity> photos = new ArrayList<>();
+            while (resultSet.next()) {
+                photos.add(PhotoEntity.buildPhotoEntity(resultSet));
+            }
+            return photos;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void setValues(PhotoEntity photo, PreparedStatement preparedStatement) throws SQLException {
         preparedStatement.setString(1, photo.getPhotoTheme());
         preparedStatement.setString(2, photo.getPhotoFormat());
         preparedStatement.setString(3, photo.getResolution());
         preparedStatement.setInt(4, photo.getPhotographer().getId());
         preparedStatement.setDouble(5, photo.getSize());
-        preparedStatement.setBoolean(6, photo.getFree()); //method's name?
+        preparedStatement.setBoolean(6, photo.getIsFree()); //method's name?
         preparedStatement.setBigDecimal(7, photo.getCost());
         preparedStatement.setTimestamp(8, Timestamp.valueOf(photo.getCreatedAt()));
+        preparedStatement.setString(9, photo.getLink());
     }
 }

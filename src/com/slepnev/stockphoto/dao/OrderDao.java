@@ -19,11 +19,11 @@ public class OrderDao implements Dao<Integer, OrderEntity> {
             VALUES (?,?,?,?,?);
             """;
     private static final String FIND_ALL_SQL = """
-            SELECT id, 
-            status, 
-            number_of_photo, 
+            SELECT id,
+            status,
+            number_of_photo,
             photo_id,
-            cost, 
+            cost,
             users_id
             FROM orders
             """;
@@ -53,7 +53,7 @@ public class OrderDao implements Dao<Integer, OrderEntity> {
 
     @Override
     public OrderEntity save(OrderEntity order) {
-        try (var connection = ConnectionManager.get();) {
+        try (var connection = ConnectionManager.get()) {
             var preparedStatement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS);
             setValues(order, preparedStatement);
             var generatedKeys = preparedStatement.getGeneratedKeys();

@@ -16,8 +16,8 @@ public class RandomUtils {
     );
 
     private static final List<String> names = List.of(
-            "Abramson Oliver", "Jack Jenkin", "James Harry", "Jacob Jenkin", "Charley",
-            "Thomas Brooks", "George Mercer", "Oscar Carter", "Maxim Derrick", "Will Ellington"
+            "Андей Петров", "Екатерина Иванова", "Николай Смирнов", "Наталья Серебеникова", "Анна Чернега",
+            "Иван Иванов", "Анатолий Пермяков", "Владимир Попов", "Андей Абросов", "Станислав Гусев"
     );
 
     private static final List<String> usernames = List.of(
@@ -68,7 +68,7 @@ public class RandomUtils {
     }
 
     public static String randomUsername() {
-        return usernames.get(randomIndex(names));
+        return usernames.get(randomIndex(usernames));
     }
 
     public static String randomEmail() {

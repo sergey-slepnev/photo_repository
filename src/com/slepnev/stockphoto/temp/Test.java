@@ -29,7 +29,7 @@ public final class Test {
         var photographer = new PhotographerEntity();
         photographer.setUsername(randomUsername());
         photographer.setEmail(randomEmail());
-        photographer.setName(randomName());
+        photographer.setPassword(randomName());
         photographer.setPhoneNumber(randomPhoneNumber());
         photographer.setSocialNetwork(randomSocialNetworkLink());
         photographer.setStatus(PhotographerStatusEnum.ACTIVE.name());
@@ -69,12 +69,25 @@ public final class Test {
         photo.setPhotoTheme(PhotoThemeEnum.CATS.name());
         photo.setPhotoFormat(PhotoFormatEnum.JPEG.name());
         photo.setResolution(randomResolution());
+//        photo.setPhotographer();
         photo.setSize(randomSize());
         photo.setIsFree(true);
         photo.setCost(BigDecimal.valueOf(150, 35));
         photo.setCreatedAt(LocalDateTime.now());
         PHOTO_DAO.save(photo);
     }
+
+    public static Optional<PhotoEntity> photoFindByIdTest(Long id) {
+        var maybePhoto = PHOTO_DAO.findById(id);
+        System.out.println("Find by id = " + id + " maybePhoto test:");
+        maybePhoto.ifPresent(System.out::println);
+        return maybePhoto;
+    }
+
+
+
+
+
 //
 //    private static void updateTest() {
 //        var instance = PhotographerDao.getInstance();
